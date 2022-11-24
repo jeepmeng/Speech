@@ -9,7 +9,8 @@ pinyin_dict = r'dict.txt'
 train_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt'
 dev_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/dev.wav.txt'
 test_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/test.wav.txt'
-
+data_pth = r'/Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS'
+label = r'/Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt'
 
 
 def read_wav_data(filename: str) -> tuple:
@@ -46,7 +47,7 @@ def load_pinyin_dict(filename: str) -> tuple:
     with open(filename, 'r', encoding='utf-8') as file_pointer:
         lines = file_pointer.read().split('\n')
         # print(len(lines))
-    for line in lines[]:
+    for line in lines:
         # print(line)
         if len(line) == 0:
             continue
@@ -73,30 +74,36 @@ class DataLoader:
         # config = load_config_file(DEFAULT_CONFIG_FILENAME)
 
         self.pinyin_list, self.pinyin_dict = load_pinyin_dict(pinyin_dict)
+        print('self.pinyin_dict-----{}'.format(len(self.pinyin_dict)))
 
         # for index in range(len(config['dataset'][self.dataset_type])):
-        for index in DATA_SET_NAME:
-            idx = index+'_'+self.dataset_type
-            print(type(idx),idx)
-            filename_datalist = config['dataset'][self.dataset_type][idx]['data_list']
-            filename_datapath = config['dataset'][self.dataset_type][idx]['data_pth']
-            with open(filename_datalist, 'r', encoding='utf-8') as file_pointer:
-                lines = file_pointer.read().split('\n')
-                for line in lines:
-                    if len(line) == 0:
-                        continue
-                    tokens = line.split(' ')
-                    self.data_list.append(tokens[0])
-                    self.wav_dict[tokens[0]] = os.path.join(filename_datapath, tokens[1])
+        # for index in DATA_SET_NAME:
+        # idx = index+'_'+self.dataset_type
+        # print(type(idx),idx)
+        # filename_datalist = config['dataset'][self.dataset_type][idx]['data_list']
+        # filename_datapath = config['dataset'][self.dataset_type][idx]['data_pth']
+        filename_datalist = train_data_dict
+        filename_datapath = data_pth
+        with open(filename_datalist, 'r', encoding='utf-8') as file_pointer:
+            lines = file_pointer.read().split('\n')
+            for line in lines:
+                if len(line) == 0:
+                    continue
+                tokens = line.split(' ')
+                self.data_list.append(tokens[0])
+                self.wav_dict[tokens[0]] = os.path.join(filename_datapath, tokens[1].split('/')[-1])
 
-            filename_labellist = config['dataset'][self.dataset_type][idx]['label_list']
-            with open(filename_labellist, 'r', encoding='utf-8') as file_pointer:
-                lines = file_pointer.read().split('\n')
-                for line in lines:
-                    if len(line) == 0:
-                        continue
-                    tokens = line.split(' ')
-                    self.label_dict[tokens[0]] = tokens[1:]
+        filename_labellist = label
+        with open(filename_labellist, 'r', encoding='utf-8') as file_pointer:
+            lines = file_pointer.read().split('\n')
+            for line in lines:
+                if len(line) == 0:
+                    continue
+                tokens = line.split(' ')
+                self.label_dict[tokens[0]] = tokens[1:]
+        # print('self.data_list---------{}'.format(self.data_list[:2]))
+        # print('self.label_dict---------{}'.format(self.label_dict['20170001P00001A0001']))
+        # print('self.wav_dict---------{}'.format(self.wav_dict['20170001P00001A0001']))
 
 
     def get_data_count(self) -> int:
@@ -126,42 +133,55 @@ class DataLoader:
 
 
 
-class MyDataset(torch.utils.data.Dataset):  # 创建自己的类：MyDataset,这个类是继承的torch.utils.data.Dataset
-    def __init__(self, root, pinyin_pth, datatxt, transform=None, target_transform=None):  # 初始化一些需要传入的参数
-        _, self.label = load_pinyin_dict(pinyin_pth)
-
-        fh = open(root + datatxt, 'r')  # 按照传入的路径和txt文本参数，打开这个文本，并读取内容
-        imgs = []  # 创建一个名为img的空列表，一会儿用来装东西
-        for line in fh:  # 按行循环txt文本中的内容
-            line = line.rstrip()  # 删除 本行string 字符串末尾的指定字符，这个方法的详细介绍自己查询python
-            words = line.split()  # 通过指定分隔符对字符串进行切片，默认为所有的空字符，包括空格、换行、制表符等
-            imgs.append((words[0], int(words[1])))  # 把txt里的内容读入imgs列表保存，具体是words几要看txt内容而定
-            # 很显然，根据我刚才截图所示txt的内容，words[0]是图片信息，words[1]是lable
-        self.imgs = imgs
-        self.transform = transform
-        self.target_transform = target_transform
-
-    def __getitem__(self, index):  # 这个方法是必须要有的，用于按照索引读取每个元素的具体内容
-        fn, label = self.imgs[index]  # fn是图片path #fn和label分别获得imgs[index]也即是刚才每行中word[0]和word[1]的信息
-        img = Image.open(root + fn).convert('RGB')  # 按照path读入图片from PIL import Image # 按照路径读取图片
-
-        if self.transform is not None:
-            img = self.transform(img)  # 是否进行transform
-        return img, label  # return很关键，return回哪些内容，那么我们在训练时循环读取每个batch时，就能获得哪些内容
-
-    def __len__(self):  # 这个函数也必须要写，它返回的是数据集的长度，也就是多少张图片，要和loader的长度作区分
-        return len(self.imgs)
+# class MyDataset(torch.utils.data.Dataset):  # 创建自己的类：MyDataset,这个类是继承的torch.utils.data.Dataset
+#     def __init__(self, root, pinyin_pth, datatxt, transform=None, target_transform=None):  # 初始化一些需要传入的参数
+#         _, self.label = load_pinyin_dict(pinyin_pth)
+#
+#         fh = open(root + datatxt, 'r')  # 按照传入的路径和txt文本参数，打开这个文本，并读取内容
+#         imgs = []  # 创建一个名为img的空列表，一会儿用来装东西
+#         for line in fh:  # 按行循环txt文本中的内容
+#             line = line.rstrip()  # 删除 本行string 字符串末尾的指定字符，这个方法的详细介绍自己查询python
+#             words = line.split()  # 通过指定分隔符对字符串进行切片，默认为所有的空字符，包括空格、换行、制表符等
+#             imgs.append((words[0], int(words[1])))  # 把txt里的内容读入imgs列表保存，具体是words几要看txt内容而定
+#             # 很显然，根据我刚才截图所示txt的内容，words[0]是图片信息，words[1]是lable
+#         self.imgs = imgs
+#         self.transform = transform
+#         self.target_transform = target_transform
+#
+#     def __getitem__(self, index):  # 这个方法是必须要有的，用于按照索引读取每个元素的具体内容
+#         fn, label = self.imgs[index]  # fn是图片path #fn和label分别获得imgs[index]也即是刚才每行中word[0]和word[1]的信息
+#         img = Image.open(root + fn).convert('RGB')  # 按照path读入图片from PIL import Image # 按照路径读取图片
+#
+#         if self.transform is not None:
+#             img = self.transform(img)  # 是否进行transform
+#         return img, label  # return很关键，return回哪些内容，那么我们在训练时循环读取每个batch时，就能获得哪些内容
+#
+#     def __len__(self):  # 这个函数也必须要写，它返回的是数据集的长度，也就是多少张图片，要和loader的长度作区分
+#         return len(self.imgs)
 
 
 # 根据自己定义的那个勒MyDataset来创建数据集！注意是数据集！而不是loader迭代器
-train_data = MyDataset(txt=root + 'train.txt', transform=transforms.ToTensor())
-test_data = MyDataset(txt=root + 'test.txt', transform=transforms.ToTensor())
+
+
+
+# train_data = MyDataset(txt=root + 'train.txt', transform=transforms.ToTensor())
+# test_data = MyDataset(txt=root + 'test.txt', transform=transforms.ToTensor())
 
 
 
 if __name__ == '__main__':
 
-    a,b = load_pinyin_dict(pinyin_dict)
-    print(a)
-    print(b)
+    # a,b = load_pinyin_dict(pinyin_dict)
+
+    cl = DataLoader()
+    # cl._load_data()
+    # print(len(cl.data_list))
+
+    wav_signal, sample_rate, data_label = cl.get_data(5)
+    # print(cl.get_data_count())
+    print('wav_signal-----{}'.format(len(wav_signal[0])))
+    print('sample_rate-----{}'.format(sample_rate))
+    print('data_label-----{}'.format(data_label))
+
     print('done')
+

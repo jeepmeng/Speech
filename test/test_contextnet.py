@@ -2,6 +2,7 @@ import unittest
 
 from contextnet.model import ContextNet
 import torch
+import dataset
 
 
 class TestContextNet(unittest.TestCase):
