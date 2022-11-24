@@ -3,14 +3,25 @@ import numpy as np
 import os
 import soundfile
 import glob
+import json
 import wave
+from speech_features import speech_features
 
-pinyin_dict = r'dict.txt'
-train_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt'
-dev_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/dev.wav.txt'
-test_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/test.wav.txt'
-data_pth = r'/Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS'
-label = r'/Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt'
+pth = r'config.json'
+
+def load_config_file(pth):
+
+    with open (pth,'r') as f:
+        config = json.load(f)
+    return config
+
+
+# pinyin_dict = r'dict.txt'
+# train_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt'
+# dev_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/dev.wav.txt'
+# test_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/test.wav.txt'
+# data_pth = r'/Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS'
+# label = r'/Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt'
 
 
 def read_wav_data(filename: str) -> tuple:
@@ -60,8 +71,9 @@ def load_pinyin_dict(filename: str) -> tuple:
 
 
 class DataLoader:
-    def __init__(self, dataset_type = 'train'):
+    def __init__(self, pinyin_dict, dataset_type = 'train'):
         self.dataset_type = dataset_type
+        self.PINYIN = pinyin_dict
 
         self.data_list = list()
         self.wav_dict = dict()
@@ -69,11 +81,12 @@ class DataLoader:
         self.pinyin_list = list()#拼音索引
         self.pinyin_dict = dict()#汉字段长度
         self._load_data()
+        self.data_count = self.get_data_count()
 
     def _load_data(self):
         # config = load_config_file(DEFAULT_CONFIG_FILENAME)
 
-        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(pinyin_dict)
+        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(self.PINYIN)
         print('self.pinyin_dict-----{}'.format(len(self.pinyin_dict)))
 
         # for index in range(len(config['dataset'][self.dataset_type])):
@@ -173,15 +186,21 @@ if __name__ == '__main__':
 
     # a,b = load_pinyin_dict(pinyin_dict)
 
-    cl = DataLoader()
-    # cl._load_data()
-    # print(len(cl.data_list))
-
-    wav_signal, sample_rate, data_label = cl.get_data(5)
-    # print(cl.get_data_count())
-    print('wav_signal-----{}'.format(len(wav_signal[0])))
-    print('sample_rate-----{}'.format(sample_rate))
-    print('data_label-----{}'.format(data_label))
+    # cl = DataLoader()
+    # # cl._load_data()
+    #
+    # wav_signal, sample_rate, data_label = cl.get_data(5)
+    # print('wav_signal-----{}'.format(len(wav_signal[0])))
+    # print('sample_rate-----{}'.format(sample_rate))
+    # print('data_label-----{}'.format(len(data_label)))
+    #
+    #
+    # ll = speech_features.MFCC()
+    # data_input = ll.run(wav_signal)
+    #
+    # print('data_input-----{}'.format(len(data_input)))
+    config = load_config_file(pth)
+    print(config['dic_filename'])
 
     print('done')
 
