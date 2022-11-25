@@ -5,16 +5,18 @@ import soundfile
 import glob
 import json
 import wave
+import yaml
 from speech_features import speech_features
 
 pth = r'config.json'
 
 def load_config_file(pth):
-
-    with open (pth,'r') as f:
-        config = json.load(f)
+    with open("config.yml", "r", encoding="utf8") as f:
+        config = yaml.load(f, Loader=yaml.FullLoader)
     return config
 
+
+DEFAULT_CONFIG_FILENAME = r'config.json'
 
 # pinyin_dict = r'dict.txt'
 # train_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt'
@@ -71,9 +73,9 @@ def load_pinyin_dict(filename: str) -> tuple:
 
 
 class DataLoader:
-    def __init__(self, pinyin_dict, dataset_type = 'train'):
+    def __init__(self, dataset_type = 'train'):
         self.dataset_type = dataset_type
-        self.PINYIN = pinyin_dict
+        # self.PINYIN = pinyin_dict
 
         self.data_list = list()
         self.wav_dict = dict()
@@ -84,9 +86,9 @@ class DataLoader:
         self.data_count = self.get_data_count()
 
     def _load_data(self):
-        # config = load_config_file(DEFAULT_CONFIG_FILENAME)
+        config = load_config_file(DEFAULT_CONFIG_FILENAME)
 
-        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(self.PINYIN)
+        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(config['dic_filename'])
         print('self.pinyin_dict-----{}'.format(len(self.pinyin_dict)))
 
         # for index in range(len(config['dataset'][self.dataset_type])):
@@ -95,8 +97,8 @@ class DataLoader:
         # print(type(idx),idx)
         # filename_datalist = config['dataset'][self.dataset_type][idx]['data_list']
         # filename_datapath = config['dataset'][self.dataset_type][idx]['data_pth']
-        filename_datalist = train_data_dict
-        filename_datapath = data_pth
+        filename_datalist = config['st-cmds']['train']['data_list']
+        filename_datapath = config['st-cmds']['train']['data_pth']
         with open(filename_datalist, 'r', encoding='utf-8') as file_pointer:
             lines = file_pointer.read().split('\n')
             for line in lines:
@@ -106,7 +108,7 @@ class DataLoader:
                 self.data_list.append(tokens[0])
                 self.wav_dict[tokens[0]] = os.path.join(filename_datapath, tokens[1].split('/')[-1])
 
-        filename_labellist = label
+        filename_labellist = config['st-cmds']['train']['label_list']
         with open(filename_labellist, 'r', encoding='utf-8') as file_pointer:
             lines = file_pointer.read().split('\n')
             for line in lines:
@@ -186,21 +188,21 @@ if __name__ == '__main__':
 
     # a,b = load_pinyin_dict(pinyin_dict)
 
-    # cl = DataLoader()
-    # # cl._load_data()
-    #
-    # wav_signal, sample_rate, data_label = cl.get_data(5)
+    cl = DataLoader()
+    # cl._load_data()
+
+    wav_signal, sample_rate, data_label = cl.get_data(5)
     # print('wav_signal-----{}'.format(len(wav_signal[0])))
     # print('sample_rate-----{}'.format(sample_rate))
     # print('data_label-----{}'.format(len(data_label)))
-    #
-    #
-    # ll = speech_features.MFCC()
-    # data_input = ll.run(wav_signal)
-    #
-    # print('data_input-----{}'.format(len(data_input)))
-    config = load_config_file(pth)
-    print(config['dic_filename'])
+
+
+    ll = speech_features.MFCC()
+    data_input = ll.run(wav_signal)
+
+    print('data_input-----{}'.format(len(data_input)))
+    # config = load_config_file(pth)
+    # print(config['dic_filename'])
 
     print('done')
 

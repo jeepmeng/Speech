@@ -1,0 +1,7 @@
+dic_filename: dict.txt
+second_dataset: pth
+st-cmds:
+  train:
+    data_list: /Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt
+    data_pth: /Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS
+    label_list: /Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt
