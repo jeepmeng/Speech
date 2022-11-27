@@ -1,0 +1,14 @@
+#词典文件
+dic_filename: dict.txt
+#后续可加不同数据库名称
+second_dataset: None
+#st-cmds数据库
+st-cmds:
+  #训练数据集
+  train:
+    #数据名称文件
+    data_list: /Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt
+    #数据路径文件夹
+    data_pth: /Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS
+    #数据标签文件
+    label_list: /Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt
