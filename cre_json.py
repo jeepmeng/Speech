@@ -36,7 +36,7 @@ test_dict = \
 #   - 6
 
 
-with open("config.yml", "r", encoding="utf8") as f:
+with open("config_win.yml", "r", encoding="utf8") as f:
     a = yaml.load(f, Loader=yaml.FullLoader)
 
     print(a)
