@@ -7,8 +7,8 @@ st-cmds:
   #训练数据集
   train:
     #数据名称文件
-    data_list: r'E:/Speech/st-cmds/train.wav.txt'
+    data_list: E:/Speech/st-cmds/train.wav.txt
     #数据路径文件夹
-    data_pth: r'E:/speech-dataset/ST-CMDS-20170001_1-OS/ST-CMDS-20170001_1-OS'
+    data_pth: E:/speech-dataset/ST-CMDS-20170001_1-OS/ST-CMDS-20170001_1-OS
     #数据标签文件
-    label_list: r'E:/Speech\st-cmds/train.syllable.txt'
+    label_list: E:/Speech\st-cmds/train.syllable.txt

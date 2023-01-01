@@ -190,7 +190,7 @@ class ContextNet(nn.Module):
             output = self.decode(encoder_output, max_lengths)
             outputs.append(output)
 
-        outputs = torch.stack(outputs, dim=0)
+        # outputs = torch.stack(outputs, dim=0)
 
         return outputs  # (B, T)
 

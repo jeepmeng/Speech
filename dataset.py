@@ -11,12 +11,12 @@ from speech_features import speech_features
 pth = r'config.json'
 
 def load_config_file(pth):
-    with open("config.yml", "r", encoding="utf8") as f:
+    with open(pth, "r", encoding="utf8") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     return config
 
 
-DEFAULT_CONFIG_FILENAME = r'config.json'
+DEFAULT_CONFIG_FILENAME = r'config_win.yml'
 
 # pinyin_dict = r'dict.txt'
 # train_data_dict = r'/Users/liufucong/Downloads/ltxm/ContextNet-master/datalist/st-cmds/train.wav.txt'
@@ -184,25 +184,26 @@ class DataLoader:
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
 
     # a,b = load_pinyin_dict(pinyin_dict)
 
-    cl = DataLoader()
-    # cl._load_data()
-
-    wav_signal, sample_rate, data_label = cl.get_data(5)
-    # print('wav_signal-----{}'.format(len(wav_signal[0])))
-    # print('sample_rate-----{}'.format(sample_rate))
-    # print('data_label-----{}'.format(len(data_label)))
-
-
-    ll = speech_features.MFCC()
-    data_input = ll.run(wav_signal)
-
-    print('data_input-----{}'.format(len(data_input)))
-    # config = load_config_file(pth)
-    # print(config['dic_filename'])
-
-    print('done')
+    # cl = DataLoader()
+    # # cl._load_data()
+    #
+    # wav_signal, sample_rate, data_label = cl.get_data(5)
+    # # print('wav_signal-----{}'.format(len(wav_signal[0])))
+    # # print('sample_rate-----{}'.format(sample_rate))
+    # # print('data_label-----{}'.format(len(data_label)))
+    #
+    #
+    # ll = speech_features.MFCC()
+    # data_input = ll.run(wav_signal)
+    #
+    # print('data_input-----{}'.format(data_input.shape))
+    # print('data_label_shape------{}'.format(data_label))
+    # # config = load_config_file(pth)
+    # # print(config['dic_filename'])
+    #
+    # print('done')
 
