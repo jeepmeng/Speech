@@ -1,6 +1,6 @@
 ######################################################################
 # Build Tools
-
+ignore_test.py
 /config_mac.yml
 /config_win.yml
 /__pycache__
