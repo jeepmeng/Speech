@@ -5,52 +5,32 @@ import os
 import yaml
 import wave
 from torch.utils.data import DataLoader
+from torch.utils.data import Dataset
 from speech_features import speech_features
 
 import os.path
 
-class Mydataset(torch.utils.data.Dataset):
+# DEFAULT_CONFIG_FILENAME = r'config_mac.yml'
+
+class Mydataset(Dataset):
     def __init__(self):
-        super(Mydataset, self).__init__()
+        # super(Mydataset, self).__init__()
         self.data_list = list()
         self.wav_dict = dict()
         self.label_dict = dict()
-        self.pinyin_list = list()  # 拼音索引
-        self.pinyin_dict = dict()  # 汉字段长度
+        # self.pinyin_list = list()  # 拼音索引
+        # self.pinyin_dict = dict()  # 汉字段长度
 
 
-        self.DEFAULT_CONFIG_FILENAME = r'config_win.yml'
-
+        self.DEFAULT_CONFIG_FILENAME = r'/Users/liufucong/Downloads/ltxm/Speech/config_mac.yml'
+        self.config = load_config_file(self.DEFAULT_CONFIG_FILENAME)
+        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(self.config['dic_filename'])
+        self._load_data()
 
 
     def __getitem__(self, index):
-        config = load_config_file(self.DEFAULT_CONFIG_FILENAME)
+        # config = load_config_file(self.DEFAULT_CONFIG_FILENAME)
 
-        self.pinyin_list, self.pinyin_dict = load_pinyin_dict(config['dic_filename'])
-
-
-        filename_datalist = config['st-cmds']['train']['data_list']
-        # print(filename_datalist)
-        filename_datapath = config['st-cmds']['train']['data_pth']
-        # print(filename_datapath)
-        with open(filename_datalist, 'r', encoding='utf-8') as file_pointer:
-            lines = file_pointer.read().split('\n')
-            for line in lines:
-                if len(line) == 0:
-                    continue
-                tokens = line.split(' ')
-                self.data_list.append(tokens[0])
-                self.wav_dict[tokens[0]] = os.path.join(filename_datapath, tokens[1].split('/')[-1])
-            # print(self.wav_dict)
-            # print('open filename is done')
-        filename_labellist = config['st-cmds']['train']['label_list']
-        with open(filename_labellist, 'r', encoding='utf-8') as file_pointer:
-            lines = file_pointer.read().split('\n')
-            for line in lines:
-                if len(line) == 0:
-                    continue
-                tokens = line.split(' ')
-                self.label_dict[tokens[0]] = tokens[1:]
 
         mark = self.data_list[index]
         # print('mark is here', mark)
@@ -65,25 +45,50 @@ class Mydataset(torch.utils.data.Dataset):
             labels.append(self.pinyin_dict[item])
 
         data_label = np.array(labels)
-        print('__data_label is done')
+        label_length = data_label.shape[0]
+        # print('__data_label is done')
         mfcc_feature = speech_features.MFCC()
         data_input = mfcc_feature.run(wav_signal, sample_rate)
-        print('__get_items is done')
-        return data_input, data_label
+        data_length = data_input.shape[1]
+        # print('__get_items is done')
+        return data_input, data_label, data_length, label_length
 
     def __len__(self):
         return len(self.data_list)
     # @staticmethod
+    def _load_data(self):
+        filename_datalist = self.config['st-cmds']['train']['data_list']
+        # print(filename_datalist)
+        filename_datapath = self.config['st-cmds']['train']['data_pth']
+        # print(filename_datapath)
+        with open(filename_datalist, 'r', encoding='utf-8') as file_pointer:
+            lines = file_pointer.read().split('\n')
+            for line in lines:
+                if len(line) == 0:
+                    continue
+                tokens = line.split(' ')
+                self.data_list.append(tokens[0])
+                self.wav_dict[tokens[0]] = os.path.join(filename_datapath, tokens[1].split('/')[-1])
+            # print(self.wav_dict)
+            # print('open filename is done')
+        filename_labellist = self.config['st-cmds']['train']['label_list']
+        with open(filename_labellist, 'r', encoding='utf-8') as file_pointer:
+            lines = file_pointer.read().split('\n')
+            for line in lines:
+                if len(line) == 0:
+                    continue
+                tokens = line.split(' ')
+                self.label_dict[tokens[0]] = tokens[1:]
 
 
 
-def load_config_file( pth):
+def load_config_file(pth):
     with open(pth, "r", encoding="utf8") as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
     return config
 
 # @staticmethod
-def load_pinyin_dict( filename: str) -> tuple:
+def load_pinyin_dict(filename: str) -> tuple:
     """
     加载拼音列表和拼音字典
 
@@ -109,7 +114,7 @@ def load_pinyin_dict( filename: str) -> tuple:
     return _pinyin_list, _pinyin_dict
 
 # @staticmethod
-def read_wav_data( filename: str) -> tuple:
+def read_wav_data(filename: str) -> tuple:
     """
     读取一个wav文件，返回声音信号的时域谱矩阵和播放时间
     """
@@ -129,20 +134,24 @@ def read_wav_data( filename: str) -> tuple:
 
 if __name__ == '__main__':
     data_set = Mydataset()
-    data_input, data_label = data_set.__getitem__(5)
+    # print(type(data_set))
+    # data_input, data_label = data_set.__getitem__(5)
+    # #
     # print(data_input.shape)
     # print(data_label.shape)
-
-
-
     train_loader = DataLoader(dataset=data_set, batch_size=1, shuffle=False)
-    # print('hh')
-    for step, (the_input, the_label) in enumerate(train_loader):
-        print(step)
+    # # print('hh')
+    #
+    #
+    # # for epoch in range(5):
+    # #     print('hlhlhlh')
+    for i,the_data in enumerate(train_loader):
+        # print(step)
         # print('hhhh')
-        if step < 3:
-            print('data_input.shape-------{}'.format(the_input.shape))
-            print('data_label.shape-------{}'.format(the_label.shape))
+        if i<2:
+            print('data_input.shape-------{}'.format(the_data[0].shape))
+            print('data_label.shape-------{}'.format(the_data[1]))
         else:
             break
+
 

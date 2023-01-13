@@ -1,5 +1,5 @@
 #词典文件
-dic_filename: dict.txt
+dic_filename: /Users/liufucong/Downloads/ltxm/Speech/dict.txt
 #后续可加不同数据库名称
 second_dataset: None
 #st-cmds数据库
@@ -12,3 +12,26 @@ st-cmds:
     data_pth: /Users/liufucong/Downloads/ltxm/ST-CMDS-20170001_1-OS
     #数据标签文件
     label_list: /Users/liufucong/Downloads/ltxm/Speech/st-cmds/train.syllable.txt
+
+dataset:
+  root : ''
+  train: '/home/dkdlenrh/contextnet_ctc/data/zeroth_example_train_file.txt'
+  valid: '/home/dkdlenrh/contextnet_ctc/data/zeroth_test.txt'
+  test: '/home/dkdlenrh/contextnet_ctc/data/zeroth_test.txt'
+setting:
+  model_type: 'context_RNN_T'
+  loss_type: 'RNN_T_LOSS'
+
+model:
+  out_dim: ???
+
+train:
+  device: 'cuda'
+  batch_size: 4
+  epochs: 450
+  save_epoch: 1
+
+scheduler:
+  dim_model: 176
+  warmup_steps: 10000
+  k: 2

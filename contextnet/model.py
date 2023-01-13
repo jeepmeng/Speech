@@ -66,7 +66,7 @@ class ContextNet(nn.Module):
             self,
             num_vocabs: int,
             model_size: str = 'medium',
-            input_dim: int = 80,
+            input_dim: int = 39,
             encoder_num_layers: int = 5,
             decoder_num_layers: int = 1,
             kernel_size: int = 5,
@@ -82,7 +82,7 @@ class ContextNet(nn.Module):
         assert model_size in ('small', 'medium', 'large'), f'{model_size} is not supported.'
 
         alpha = self.supported_models[model_size]
-
+        print('alpha---------',alpha)
         num_channels = int(num_channels * alpha)
         encoder_output_dim = int(encoder_output_dim * alpha)
 
@@ -128,6 +128,7 @@ class ContextNet(nn.Module):
             **output** (torch.FloatTensor): Result of model predictions
         """
         encoder_output, encoder_output_lengths = self.encoder(inputs, input_lengths)
+        print('self.encoder---encoder_output------',encoder_output.size())
 
         self.decoder.rnn.flatten_parameters()
         decoder_output, _ = self.decoder(targets, target_lengths)
@@ -229,15 +230,19 @@ class JointNet(nn.Module):
 
         if encoder_output.dim() == 3 and decoder_output.dim() == 3:  # Train
             seq_lengths = encoder_output.size(1)
+            print('seq_lengths-------',seq_lengths)
             target_lengths = decoder_output.size(1)
-
+            print('target_lengths-------', target_lengths)
             encoder_output = encoder_output.unsqueeze(2)
+            print('encoder_output------shape----', encoder_output.shape)
             decoder_output = decoder_output.unsqueeze(1)
+            print('decoder_output------shape----', decoder_output.shape)
 
             encoder_output = encoder_output.repeat(1, 1, target_lengths, 1)
             decoder_output = decoder_output.repeat(1, seq_lengths, 1, 1)
 
         output = torch.cat((encoder_output, decoder_output), dim=-1)
+        print('torch.cat------shape----',output.shape)
         output = self.fc(output).log_softmax(dim=-1)
 
         return output

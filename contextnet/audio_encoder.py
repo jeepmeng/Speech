@@ -69,10 +69,14 @@ class AudioEncoder(nn.Module):
             **output_lengths** (torch.LongTensor): Tensor representing the length of the encoder output
                 `LongTensor` of size ``(batch)``
         """
+        print(inputs.shape)
         output = inputs.transpose(1, 2)
         output_lengths = input_lengths
-
+        i=0
         for block in self.blocks:
+            print('encoder_recept------',i)
             output, output_lengths = block(output, output_lengths)
+            print('output_size--------',output.size())
+            i += 1
 
         return output.transpose(1, 2), output_lengths

@@ -7,15 +7,16 @@
 
 import _thread
 import time
+import numpy as np
 
 
 # 为线程定义一个函数
-def print_time(threadName, delay):
-    count = 0
-    while count < 5:
-        time.sleep(delay)
-        count += 1
-        print("%s: %s" % (threadName, time.ctime(time.time())))
+# def print_time(threadName, delay):
+#     count = 0
+#     while count < 5:
+#         time.sleep(delay)
+#         count += 1
+#         print("%s: %s" % (threadName, time.ctime(time.time())))
 
 
 # 创建两个线程
@@ -23,11 +24,17 @@ def print_time(threadName, delay):
 
 
 if __name__ == '__main__':
-    try:
-        _thread.start_new_thread(print_time("Thread-1", 2,))
-        _thread.start_new_thread(print_time("Thread-2", 4,))
-    except:
-        print("Error: unable to start thread")
+    # try:
+    #     _thread.start_new_thread(print_time("Thread-1", 2,))
+    #     _thread.start_new_thread(print_time("Thread-2", 4,))
+    # except:
+    #     print("Error: unable to start thread")
+    #
+    # while 1:
+    #     pass
 
-    while 1:
-        pass
+    x = np.arange(12).reshape((2, 2, 3))
+    print(x)
+    y = x.transpose(1,2)
+    print(y.shape)
+    print(y)
