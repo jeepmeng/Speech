@@ -25,13 +25,13 @@ setting:
 model:
   out_dim: ???
 
-#train:
-#  device: 'cuda'
-#  batch_size: 4
-#  epochs: 450
-#  save_epoch: 1
-#
-#scheduler:
-#  dim_model: 176
-#  warmup_steps: 10000
+train:
+  device: 'cuda'
+  batch_size: 4
+  epochs: 450
+  save_epoch: 1
+
+scheduler:
+  dim_model: 176
+  warmup_steps: 10000
 #  k: 2

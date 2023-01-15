@@ -1,8 +1,6 @@
 ######################################################################
 # Build Tools
-ignore_test.py
-*.yml
-**/__pycache__
+
 
 .gradle
 /build/
@@ -45,6 +43,10 @@ nbdist/
 ######################################################################
 #### MacOS ###
 .DS_Store
+ignore_test.py
+*.yml
+/__pycache__
+
 
 # Others
 *.log
